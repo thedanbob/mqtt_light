@@ -17,7 +17,6 @@
 //#define MQTT_RETAIN true                // Retain state/availability messages (recommended)
 //#define MQTT_QOS 0                      // QOS level for mqtt messages (0 or 1)
 
-//#define CHANNELS                        // Number of channels: 1 for Basic Sonoff or 1-4 for 4CH
 //#define ENABLE_LED true                 // Enable the status LED
 
 // Friendly name(s) for device discovery
@@ -26,6 +25,10 @@
 //#define NAME_2 "Sonoff light 2"
 //#define NAME_3 "Sonoff light 3"
 //#define NAME_4 "Sonoff light 4"
+
+// Number of channels: 1 for Basic Sonoff or 1-4 for 4CH
+// If unset, determined by defined NAME_ constants
+//#define CHANNELS
 
 // Restore relay states after power loss. If set to false, relay will be off when power is restored.
 // 2-4 only apply to Sonoff 4CH.
@@ -74,7 +77,15 @@
   #define MQTT_QOS 0
 #endif
 #ifndef CHANNELS
-  #define CHANNELS 1
+  #if defined(NAME_4)
+    #define CHANNELS 4
+  #elif defined(NAME_3)
+    #define CHANNELS 3
+  #elif defined(NAME_2)
+    #define CHANNELS 2
+  #else
+    #define CHANNELS 1
+  #endif
 #endif
 #if CHANNELS > 4
   #define CHANNELS 4
