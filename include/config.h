@@ -18,6 +18,7 @@
 //#define MQTT_QOS 0                      // QOS level for mqtt messages (0 or 1)
 
 //#define ENABLE_LED true                 // Enable the status LED
+//#define WIFI_TIMEOUT 5                  // Minutes to wait for a wifi connection before rebooting
 
 // Friendly name(s) for device discovery
 // Note: blank by default to save memory
@@ -92,6 +93,9 @@
 #endif
 #ifndef ENABLE_LED
   #define ENABLE_LED true
+#endif
+#ifndef WIFI_TIMEOUT
+  #define WIFI_TIMEOUT 5
 #endif
 #ifndef RESTORE_STATE_1
   #define RESTORE_STATE_1 true
@@ -190,7 +194,7 @@
 #endif
 
 #ifndef VERSION
-  #define VERSION 20220412000000
+  #define VERSION "20220412000000"
 #endif
 
 #endif

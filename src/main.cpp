@@ -11,8 +11,16 @@ MQTTClient mqtt;
 
 Ticker sysUpdate;
 Ticker blinkTimer;
+Ticker watchdog;
 bool updateInProgress{false};
 char uid[16];
+
+void reboot() {
+  for (size_t ch{0}; ch < CHANNELS; ch++) {
+    relay.hasChanged(ch); // Save current state before reboot (if configured)
+  }
+  ESP.restart();
+}
 
 void setup() {
   sprintf(uid, "sonoff_%06X", ESP.getChipId());
@@ -31,6 +39,7 @@ void setup() {
 
   WiFi.mode(WIFI_STA);
   WiFi.hostname(uid);
+  WiFi.setAutoReconnect(true);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
   while (WiFi.waitForConnectResult() != WL_CONNECTED) {
@@ -100,9 +109,14 @@ void setup() {
 
 void loop() {
   if (WiFi.status() != WL_CONNECTED) {
+    if (!watchdog.active()) {
+      watchdog.once(WIFI_TIMEOUT*60, reboot);
+    }
     startBlinking(blinkTimer);
     if (WiFi.waitForConnectResult() != WL_CONNECTED) return;
   }
+
+  watchdog.detach();
 
   ArduinoOTA.handle();
   if (updateInProgress) return; // Disable mqtt handling during update
