@@ -4,50 +4,31 @@
 #include "config.h"
 #include "Relay.h"
 #include "MqttClient.h"
+#include "LED.h"
 
 Relay relay;
 MQTTClient mqtt;
 
 Ticker sysUpdate;
+Ticker blinkTimer;
 bool updateInProgress{false};
 char uid[16];
 
-#if ENABLE_LED
-  Ticker blinkTimer;
-
-  void startBlinking() {
-    if (blinkTimer.active()) return;
-
-    blinkTimer.attach_ms(300, []() {
-      digitalWrite(LED_PIN, !digitalRead(LED_PIN));
-    });
-  }
-
-  void stopBlinking() {
-    blinkTimer.detach();
-    digitalWrite(LED_PIN, LOW);
-  }
-#endif
-
 void setup() {
-  #if ENABLE_LED
-    pinMode(LED_PIN, OUTPUT);
-    digitalWrite(LED_PIN, LOW); // LED is inverted, LOW = on
-  #endif
-
   sprintf(uid, "sonoff_%06X", ESP.getChipId());
 
   LOG_BEGIN(115200);
   LOG_F("\n\nUnit ID: %s\n", uid);
+
+  initLED();
 
   // Setup buttons & relays, restore state
   // Puts device into update mode (no MQTT) if first button is held
   relay.init(updateInProgress);
 
   LOG_F("Connecting to wifi %s: ", WIFI_SSID);
-  #if ENABLE_LED
-    startBlinking(); // Blink LED until wifi && mqtt connected
-  #endif
+  startBlinking(blinkTimer); // Blink LED until wifi && mqtt connected
+
   WiFi.mode(WIFI_STA);
   WiFi.hostname(uid);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
@@ -78,9 +59,7 @@ void setup() {
   #if defined(DEBUG) || ENABLE_LED
     ArduinoOTA.onProgress([](size_t progress, size_t total) {
       LOG_F("Progress: %u%%\r", (progress / (total / 100)));
-      #if ENABLE_LED
-        digitalWrite(LED_PIN, (progress / (total / 20)) % 2); // Toggle LED every 5%
-      #endif
+      setLED((progress / (total / 20)) % 2); // Toggle LED every 5%
     });
   #endif
 
@@ -121,10 +100,7 @@ void setup() {
 
 void loop() {
   if (WiFi.status() != WL_CONNECTED) {
-    #if ENABLE_LED
-      startBlinking();
-    #endif
-
+    startBlinking(blinkTimer);
     if (WiFi.waitForConnectResult() != WL_CONNECTED) return;
   }
 
@@ -133,17 +109,14 @@ void loop() {
 
   // (Re)connect to mqtt
   if (!mqtt.connected()) {
+    startBlinking(blinkTimer);
+
     if (!mqtt.connect(uid)) {
-      #if ENABLE_LED
-        startBlinking();
-      #endif
       delay(100);
       return;
     }
 
-    #if ENABLE_LED
-      stopBlinking();
-    #endif
+    stopBlinking(blinkTimer);
 
     // Send all info on (re)connection
     mqtt.sendSys();
