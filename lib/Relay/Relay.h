@@ -9,7 +9,7 @@ class Relay {
     Relay();
     void init(bool &updateMode);
     bool get(size_t ch);
-    void set(size_t ch, bool on, bool write = true);
+    void set(size_t ch, bool state);
     bool hasChanged(size_t ch);
 
   private:
