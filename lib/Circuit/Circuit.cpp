@@ -13,6 +13,11 @@ Circuit::Circuit() :
 {}
 
 void Circuit::init(bool &updateMode) {
+  #ifdef GOSUND
+    pinMode(STATE, INPUT);
+    pinMode(BTN_LED, OUTPUT);
+  #endif
+
   EEPROM.begin(CHANNELS);
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
@@ -30,8 +35,13 @@ void Circuit::init(bool &updateMode) {
     set(ch, _restoreState[ch] ? EEPROM.read(ch) : LOW);
     _lastState[ch] = get(ch);
 
-    // Toggle relay after momentary button press
     _btnTimer[ch].attach_ms(50, [this, ch]() {
+      #ifdef GOSUND
+        // Keep LED in sync with circuit state
+        invertedWrite(BTN_LED, get(ch));
+      #endif
+
+      // Toggle relay after momentary button press
       if (invertedRead(_buttonPin[ch])) {
         _btnCount[ch]++;
       } else {
@@ -45,11 +55,20 @@ void Circuit::init(bool &updateMode) {
 }
 
 bool Circuit::get(size_t ch) {
-  return digitalRead(_relayPin[ch]);
+  #ifndef GOSUND // 2-way switch
+    return digitalRead(_relayPin[ch]);
+  #elif defined(REVERSE_STATE)
+    return invertedRead(STATE);
+  #else
+    return digitalRead(STATE);
+  #endif
 }
 
 void Circuit::set(size_t ch, bool state) {
-  digitalWrite(_relayPin[ch], state);
+  // Less efficient than digitalWrite but works for both 2- and 3-way switches
+  if (get(ch) != state) {
+    toggleOutput(_relayPin[ch]);
+  }
 }
 
 bool Circuit::hasChanged(size_t ch) {

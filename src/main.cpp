@@ -23,7 +23,11 @@ void reboot() {
 }
 
 void setup() {
-  sprintf(uid, "sonoff_%06X", ESP.getChipId());
+  #ifdef GOSUND
+    sprintf(uid, "gosund_%06X", ESP.getChipId());
+  #else
+    sprintf(uid, "sonoff_%06X", ESP.getChipId());
+  #endif
 
   LOG_BEGIN(115200);
   LOG_F("\n\nUnit ID: %s\n", uid);

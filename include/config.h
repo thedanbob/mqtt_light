@@ -19,6 +19,7 @@
 
 //#define ENABLE_LED true                 // Enable the status LED
 //#define WIFI_TIMEOUT 5                  // Minutes to wait for a wifi connection before rebooting
+//#define REVERSE_STATE                   // Reverse state pin (LOW = on) (Gosund SW6 only)
 
 // Friendly name(s) for device discovery
 // Note: blank by default to save memory
@@ -27,7 +28,7 @@
 //#define NAME_3 "Sonoff light 3"
 //#define NAME_4 "Sonoff light 4"
 
-// Number of channels: 1 for Basic Sonoff or 1-4 for 4CH
+// Number of channels: 1 for Basic Sonoff & Gosund, 1-4 for 4CH
 // If unset (recommended), determined by defined NAME_ constants
 //#define CHANNELS
 
@@ -37,6 +38,9 @@
 //#define RESTORE_STATE_2 true
 //#define RESTORE_STATE_3 true
 //#define RESTORE_STATE_4 true
+
+// Uncomment below for Gosund SW6 3-way switch
+//#define GOSUND
 
 // Uncomment below to enable debug reporting
 //#define DEBUG
@@ -149,9 +153,19 @@
 #define SLICE CONCAT(SLICE, CHANNELS)
 
 // Other constants
-#define LINK_LED 13
-#define BUTTONS SLICE(0, 9, 10, 14)
-#define RELAYS SLICE(12, 5, 4, 15)
+#ifdef GOSUND
+  #define DEVICE_MODEL "Gosund SW6"
+  #define CHANNELS 1
+  #define BTN_LED 2 // Circuit status LED
+  #define LINK_LED 16 // Wifi & MQTT status LED
+  #define BUTTONS 0
+  #define RELAYS 14
+  #define STATE 4 // 3-way switch, separate pin to sense circuit status
+#else
+  #define LINK_LED 13
+  #define BUTTONS SLICE(0, 9, 10, 14)
+  #define RELAYS SLICE(12, 5, 4, 15)
+#endif
 #define RESTORE_STATES SLICE(RESTORE_STATE_1, RESTORE_STATE_2, RESTORE_STATE_3, RESTORE_STATE_4)
 #define NAMES SLICE(NAME_1, NAME_2, NAME_3, NAME_4)
 
