@@ -16,15 +16,17 @@ MQTTClient::MQTTClient() :
     if (cmd == MQTT_MSG_RESTART) ESP.restart();
     if (_cmdCallback == nullptr || (cmd != MQTT_MSG_ON && cmd != MQTT_MSG_OFF)) return;
 
-    String topic{pub.topic()};
     size_t ch{0};
+    #if CHANNELS > 1
+      String topic{pub.topic()};
 
-    // Match topic to correct channel
-    while(ch < CHANNELS) {
-      if (topic == _commandTopic(ch)) break;
-      ch++;
-    }
-    if (ch == CHANNELS) return; // Failed to match topic
+      // Match topic to correct channel
+      while(ch < CHANNELS) {
+        if (topic == _commandTopic(ch)) break;
+        ch++;
+      }
+      if (ch == CHANNELS) return; // Failed to match topic (should never happen)
+    #endif
 
     _cmdCallback(ch, cmd == MQTT_MSG_ON);
   });
@@ -43,7 +45,7 @@ bool MQTTClient::connect(String uid) {
 
   MQTT::Subscribe subs;
 
-  for (size_t ch = 0; ch < CHANNELS; ch++) {
+  for (size_t ch{0}; ch < CHANNELS; ch++) {
     String topic{_commandTopic(ch)};
     LOG_F("Subscribing to topic %s\n", topic.c_str());
     subs.add_topic(topic, MQTT_QOS);

@@ -28,7 +28,7 @@
 //#define NAME_4 "Sonoff light 4"
 
 // Number of channels: 1 for Basic Sonoff or 1-4 for 4CH
-// If unset, determined by defined NAME_ constants
+// If unset (recommended), determined by defined NAME_ constants
 //#define CHANNELS
 
 // Restore relay states after power loss. If set to false, relay will be off when power is restored.
@@ -149,7 +149,7 @@
 #define SLICE CONCAT(SLICE, CHANNELS)
 
 // Other constants
-#define LED_PIN 13
+#define LINK_LED 13
 #define BUTTONS SLICE(0, 9, 10, 14)
 #define RELAYS SLICE(12, 5, 4, 15)
 #define RESTORE_STATES SLICE(RESTORE_STATE_1, RESTORE_STATE_2, RESTORE_STATE_3, RESTORE_STATE_4)

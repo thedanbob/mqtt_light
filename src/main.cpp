@@ -42,9 +42,7 @@ void setup() {
   WiFi.setAutoReconnect(true);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) {
-    LOG(".");
-  }
+  while (WiFi.waitForConnectResult() != WL_CONNECTED) LOG(".");
 
   LOG_LN("done");
   LOG("IP Address is "); LOG_LN(WiFi.localIP());

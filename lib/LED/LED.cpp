@@ -5,25 +5,25 @@
 #if ENABLE_LED
 
 void initLED() {
-  pinMode(LED_PIN, OUTPUT);
+  pinMode(LINK_LED, OUTPUT);
   setLED(HIGH);
 }
 
 void setLED(int state) {
-  invertedWrite(LED_PIN, state);
+  invertedWrite(LINK_LED, state);
 }
 
 void startBlinking(Ticker &timer) {
   if (timer.active()) return;
 
   timer.attach_ms(300, []() {
-    digitalWrite(LED_PIN, !digitalRead(LED_PIN));
+    digitalWrite(LINK_LED, !digitalRead(LINK_LED));
   });
 }
 
 void stopBlinking(Ticker &timer) {
   timer.detach();
-  invertedWrite(LED_PIN, HIGH);
+  invertedWrite(LINK_LED, HIGH);
 }
 
 #else

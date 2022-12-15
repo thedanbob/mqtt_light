@@ -16,12 +16,7 @@ void Relay::init(bool &updateMode) {
   EEPROM.begin(CHANNELS);
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
-    // Initialize relays
-    pinMode(_relayPin[ch], OUTPUT);
-    set(ch, _restoreState[ch] ? EEPROM.read(ch) : LOW);
-    _lastState[ch] = get(ch);
-
-    // Initialize buttons
+    // Initialize button
     pinMode(_buttonPin[ch], INPUT);
 
     // Put device in update mode if first button is held while device starts
@@ -30,12 +25,18 @@ void Relay::init(bool &updateMode) {
       return;
     }
 
+    // Initialize relay
+    pinMode(_relayPin[ch], OUTPUT);
+    set(ch, _restoreState[ch] ? EEPROM.read(ch) : LOW);
+    _lastState[ch] = get(ch);
+
+    // Toggle relay after momentary button press
     _btnTimer[ch].attach_ms(50, [this, ch]() {
       if (invertedRead(_buttonPin[ch])) {
         _btnCount[ch]++;
       } else {
         if (_btnCount[ch] > 1) {
-          set(ch, !get(ch)); // Toggle relay
+          toggleOutput(_relayPin[ch]);
           _btnCount[ch] = 0;
         }
       }
@@ -52,7 +53,7 @@ void Relay::set(size_t ch, bool state) {
 }
 
 bool Relay::hasChanged(size_t ch) {
-  bool newState = get(ch);
+  bool newState{get(ch)};
   if (_lastState[ch] == newState) return false;
 
   _lastState[ch] = newState;
