@@ -1,12 +1,12 @@
-#ifndef RELAY_H
-#define RELAY_H
+#ifndef CIRCUIT_H
+#define CIRCUIT_H
 
 #include <Ticker.h>
 #include "config.h"
 
-class Relay {
+class Circuit {
   public:
-    Relay();
+    Circuit();
     void init(bool &updateMode);
     bool get(size_t ch);
     void set(size_t ch, bool state);

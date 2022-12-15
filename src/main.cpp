@@ -2,11 +2,11 @@
 #include <ESP8266WiFi.h>
 #include <Ticker.h>
 #include "config.h"
-#include "Relay.h"
+#include "Circuit.h"
 #include "MqttClient.h"
 #include "LED.h"
 
-Relay relay;
+Circuit circuit;
 MQTTClient mqtt;
 
 Ticker sysUpdate;
@@ -17,7 +17,7 @@ char uid[16];
 
 void reboot() {
   for (size_t ch{0}; ch < CHANNELS; ch++) {
-    relay.hasChanged(ch); // Save current state before reboot (if configured)
+    circuit.hasChanged(ch); // Save current state before reboot (if configured)
   }
   ESP.restart();
 }
@@ -32,7 +32,7 @@ void setup() {
 
   // Setup buttons & relays, restore state
   // Puts device into update mode (no MQTT) if first button is held
-  relay.init(updateInProgress);
+  circuit.init(updateInProgress);
 
   LOG_F("Connecting to wifi %s: ", WIFI_SSID);
   startBlinking(blinkTimer); // Blink LED until wifi && mqtt connected
@@ -95,7 +95,7 @@ void setup() {
   if (!updateInProgress) {
     // Set callback to run when mqtt command received
     mqtt.setCommandCallback([](size_t ch, bool state) {
-      relay.set(ch, state);
+      circuit.set(ch, state);
     });
 
     // Update system info every 10 seconds
@@ -134,15 +134,15 @@ void loop() {
     mqtt.sendSys();
     for (size_t ch{0}; ch < CHANNELS; ch++) {
       mqtt.sendDiscovery(ch, uid);
-      mqtt.sendState(ch, relay.get(ch));
+      mqtt.sendState(ch, circuit.get(ch));
     }
   }
 
   mqtt.loop();
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
-    if (relay.hasChanged(ch)) {
-      mqtt.sendState(ch, relay.get(ch));
+    if (circuit.hasChanged(ch)) {
+      mqtt.sendState(ch, circuit.get(ch));
     }
   }
 }

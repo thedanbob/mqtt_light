@@ -1,18 +1,18 @@
-#include <EEPROM.h>
-#include "Relay.h"
+#include "Circuit.h"
 #include "helper.h"
+#include <EEPROM.h>
 
-const size_t Relay::_buttonPin[]{BUTTONS};
-const size_t Relay::_relayPin[]{RELAYS};
-const bool Relay::_restoreState[]{RESTORE_STATES};
+const size_t Circuit::_buttonPin[]{BUTTONS};
+const size_t Circuit::_relayPin[]{RELAYS};
+const bool Circuit::_restoreState[]{RESTORE_STATES};
 
-Relay::Relay() :
+Circuit::Circuit() :
   _lastState{SLICE(false, false, false, false)},
   _btnCount{SLICE(0, 0, 0, 0)},
   _btnTimer{SLICE(Ticker{}, Ticker{}, Ticker{}, Ticker{})}
 {}
 
-void Relay::init(bool &updateMode) {
+void Circuit::init(bool &updateMode) {
   EEPROM.begin(CHANNELS);
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
@@ -44,15 +44,15 @@ void Relay::init(bool &updateMode) {
   }
 }
 
-bool Relay::get(size_t ch) {
+bool Circuit::get(size_t ch) {
   return digitalRead(_relayPin[ch]);
 }
 
-void Relay::set(size_t ch, bool state) {
+void Circuit::set(size_t ch, bool state) {
   digitalWrite(_relayPin[ch], state);
 }
 
-bool Relay::hasChanged(size_t ch) {
+bool Circuit::hasChanged(size_t ch) {
   bool newState{get(ch)};
   if (_lastState[ch] == newState) return false;
 
