@@ -3,12 +3,10 @@
 
 #include <WiFiClient.h>
 #include <PubSubClient.h>
-#include <functional>
 #include "config.h"
+#include "helper.h"
 
 class MQTTClient {
-  typedef std::function<void (size_t ch, bool state)> callback_t;
-
   public:
     MQTTClient();
     bool connect(String uid);
@@ -18,7 +16,7 @@ class MQTTClient {
     void sendState(size_t ch, bool state);
     void sendSys();
     void sendDiscovery(size_t ch, String uid);
-    void setCommandCallback(callback_t cb);
+    void setCommandCallback(channel_callback_t cb);
 
   private:
     static const String _names[];
@@ -28,7 +26,7 @@ class MQTTClient {
 
     WiFiClient _wifiClient;
     PubSubClient _pubSubClient;
-    callback_t _cmdCallback;
+    channel_callback_t _cmdCallback;
 
     String _commandTopic(size_t ch, bool includeBase = true);
     String _stateTopic(size_t ch, bool includeBase = true);
