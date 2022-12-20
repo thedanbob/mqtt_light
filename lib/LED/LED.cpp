@@ -22,6 +22,8 @@ void startBlinking(Ticker &timer) {
 }
 
 void stopBlinking(Ticker &timer) {
+  if (!timer.active()) return;
+
   timer.detach();
   invertedWrite(LINK_LED, HIGH);
 }

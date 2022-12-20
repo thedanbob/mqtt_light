@@ -132,8 +132,6 @@ void loop() {
       return;
     }
 
-    stopBlinking(blinkTimer);
-
     // Send all info on (re)connection
     mqtt.sendSys();
     for (size_t ch{0}; ch < CHANNELS; ch++) {
@@ -142,6 +140,7 @@ void loop() {
     }
   }
 
+  stopBlinking(blinkTimer);
   mqtt.loop();
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
