@@ -16,9 +16,7 @@ bool updateInProgress{false};
 char uid[16];
 
 void reboot() {
-  for (size_t ch{0}; ch < CHANNELS; ch++) {
-    circuit.hasChanged(ch); // Save current state before reboot (if configured)
-  }
+  circuit.processChanges(false); // Save current state before reboot (if configured)
   ESP.restart();
 }
 
@@ -102,6 +100,11 @@ void setup() {
       circuit.set(ch, state);
     });
 
+    // Set callback to run when circuit state changes
+    circuit.setChangeCallback([](size_t ch, bool state) {
+      mqtt.sendState(ch, state);
+    });
+
     // Update system info every 10 seconds
     sysUpdate.attach(10, []() {
       mqtt.sendSys();
@@ -142,10 +145,5 @@ void loop() {
 
   stopBlinking(blinkTimer);
   mqtt.loop();
-
-  for (size_t ch{0}; ch < CHANNELS; ch++) {
-    if (circuit.hasChanged(ch)) {
-      mqtt.sendState(ch, circuit.get(ch));
-    }
-  }
+  circuit.processChanges();
 }

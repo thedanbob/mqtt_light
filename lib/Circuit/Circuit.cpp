@@ -1,5 +1,4 @@
 #include "Circuit.h"
-#include "helper.h"
 #include <EEPROM.h>
 
 const size_t Circuit::_buttonPin[]{BUTTONS};
@@ -54,6 +53,10 @@ void Circuit::init(bool &updateMode) {
   }
 }
 
+void Circuit::setChangeCallback(channel_callback_t cb) {
+  _changeCallback = cb;
+}
+
 bool Circuit::get(size_t ch) {
   #ifndef THREEWAY
     return digitalRead(_relayPin[ch]);
@@ -74,15 +77,21 @@ void Circuit::set(size_t ch, bool state) {
   #endif
 }
 
-bool Circuit::hasChanged(size_t ch) {
-  bool newState{get(ch)};
-  if (_lastState[ch] == newState) return false;
+void Circuit::processChanges(bool runCallback) {
+  bool newState;
 
-  _lastState[ch] = newState;
-  if (_restoreState[ch]) {
-    EEPROM.write(ch, newState);
-    EEPROM.commit();
+  for (size_t ch{0}; ch < CHANNELS; ch++) {
+    newState = get(ch);
+    if (_lastState[ch] == newState) continue;
+
+    _lastState[ch] = newState;
+    if (_restoreState[ch]) {
+      EEPROM.write(ch, newState);
+      EEPROM.commit();
+    }
+
+    if (runCallback) {
+      _changeCallback(ch, newState);
+    }
   }
-
-  return true;
 }
