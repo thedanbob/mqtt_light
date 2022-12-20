@@ -9,6 +9,7 @@
 Circuit circuit;
 MQTTClient mqtt;
 
+Ticker stateUpdate;
 Ticker sysUpdate;
 Ticker blinkTimer;
 Ticker watchdog;
@@ -103,6 +104,11 @@ void setup() {
     // Set callback to run when circuit state changes
     circuit.setChangeCallback([](size_t ch, bool state) {
       mqtt.sendState(ch, state);
+    });
+
+    // Check circuit state every quarter second
+    stateUpdate.attach_ms(250, []() {
+      circuit.check();
     });
 
     // Update system info every 10 seconds

@@ -6,6 +6,7 @@ const size_t Circuit::_relayPin[]{RELAYS};
 const bool Circuit::_restoreState[]{RESTORE_STATES};
 
 Circuit::Circuit() :
+  _currentState{SLICE(false, false, false, false)},
   _lastState{SLICE(false, false, false, false)},
   _btnCount{SLICE(0, 0, 0, 0)},
   _btnTimer{SLICE(Ticker{}, Ticker{}, Ticker{}, Ticker{})}
@@ -77,21 +78,24 @@ void Circuit::set(size_t ch, bool state) {
   #endif
 }
 
-void Circuit::processChanges(bool runCallback) {
-  bool newState;
-
+void Circuit::check() {
   for (size_t ch{0}; ch < CHANNELS; ch++) {
-    newState = get(ch);
-    if (_lastState[ch] == newState) continue;
+    _currentState[ch] = get(ch);
+  }
+}
 
-    _lastState[ch] = newState;
+void Circuit::processChanges(bool runCallback) {
+  for (size_t ch{0}; ch < CHANNELS; ch++) {
+    if (_lastState[ch] == _currentState[ch]) continue;
+
+    _lastState[ch] = _currentState[ch];
     if (_restoreState[ch]) {
-      EEPROM.write(ch, newState);
+      EEPROM.write(ch, _currentState[ch]);
       EEPROM.commit();
     }
 
     if (runCallback) {
-      _changeCallback(ch, newState);
+      _changeCallback(ch, _currentState[ch]);
     }
   }
 }
