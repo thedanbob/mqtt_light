@@ -55,7 +55,7 @@ void Circuit::init(bool &updateMode) {
 }
 
 bool Circuit::get(size_t ch) {
-  #ifndef GOSUND // 2-way switch
+  #ifndef THREEWAY
     return digitalRead(_relayPin[ch]);
   #elif defined(REVERSE_STATE)
     return invertedRead(STATE);
@@ -65,10 +65,13 @@ bool Circuit::get(size_t ch) {
 }
 
 void Circuit::set(size_t ch, bool state) {
-  // Less efficient than digitalWrite but works for both 2- and 3-way switches
-  if (get(ch) != state) {
-    toggleOutput(_relayPin[ch]);
-  }
+  #ifndef THREEWAY
+    digitalWrite(_relayPin[ch], state);
+  #else
+    if (get(ch) != state) {
+      toggleOutput(_relayPin[ch]);
+    }
+  #endif
 }
 
 bool Circuit::hasChanged(size_t ch) {

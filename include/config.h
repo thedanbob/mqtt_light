@@ -39,8 +39,8 @@
 //#define RESTORE_STATE_3 true
 //#define RESTORE_STATE_4 true
 
-// Uncomment below for Gosund SW6 3-way switch
-//#define GOSUND
+//#define GOSUND      // Uncomment for Gosund SW1 & SW6
+//#define THREEWAY    // Uncomment to put Gosund SW6 in 3-way mode (2-way by default)
 
 // Uncomment below to enable debug reporting
 //#define DEBUG
@@ -154,7 +154,13 @@
 
 // Other constants
 #ifdef GOSUND
-  #define DEVICE_MODEL "Gosund SW6"
+  #ifndef DEVICE_MODEL
+    #ifndef THREEWAY
+      #define DEVICE_MODEL "Gosund SW1"
+    #else
+      #define DEVICE_MODEL "Gosund SW6"
+    #endif
+  #endif
   #define CHANNELS 1
   #define BTN_LED 2 // Circuit status LED
   #define LINK_LED 16 // Wifi & MQTT status LED
