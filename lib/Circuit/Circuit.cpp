@@ -1,58 +1,25 @@
 #include "Circuit.h"
 #include <EEPROM.h>
 
-const size_t Circuit::_buttonPin[]{BUTTONS};
 const size_t Circuit::_relayPin[]{RELAYS};
 const bool Circuit::_restoreState[]{RESTORE_STATES};
 
 Circuit::Circuit() :
   _currentState{SLICE(false, false, false, false)},
-  _lastState{SLICE(false, false, false, false)},
-  _btnCount{SLICE(0, 0, 0, 0)},
-  _btnTimer{SLICE(Ticker{}, Ticker{}, Ticker{}, Ticker{})}
+  _lastState{SLICE(false, false, false, false)}
 {}
 
-void Circuit::init(bool &updateMode) {
+void Circuit::init() {
   #ifdef STATE
     pinMode(STATE, INPUT);
-  #endif
-  #ifdef BTN_LED
-    pinMode(BTN_LED, OUTPUT);
   #endif
 
   EEPROM.begin(CHANNELS);
 
   for (size_t ch{0}; ch < CHANNELS; ch++) {
-    // Initialize button
-    pinMode(_buttonPin[ch], INPUT);
-
-    // Put device in update mode if first button is held while device starts
-    if (ch == 0 && invertedRead(_buttonPin[ch])) {
-      updateMode = true;
-      return;
-    }
-
-    // Initialize relay
     pinMode(_relayPin[ch], OUTPUT);
     set(ch, _restoreState[ch] ? EEPROM.read(ch) : LOW);
     _lastState[ch] = get(ch);
-
-    _btnTimer[ch].attach_ms(50, [this, ch]() {
-      #ifdef BTN_LED
-        // Keep LED in sync with circuit state
-        invertedWrite(BTN_LED, get(ch));
-      #endif
-
-      // Toggle relay after momentary button press
-      if (invertedRead(_buttonPin[ch])) {
-        _btnCount[ch]++;
-      } else {
-        if (_btnCount[ch] > 1) {
-          toggleOutput(_relayPin[ch]);
-          _btnCount[ch] = 0;
-        }
-      }
-    });
   }
 }
 
@@ -74,10 +41,12 @@ void Circuit::set(size_t ch, bool state) {
   #ifndef THREEWAY
     digitalWrite(_relayPin[ch], state);
   #else
-    if (get(ch) != state) {
-      toggleOutput(_relayPin[ch]);
-    }
+    if (get(ch) != state) toggle(ch);
   #endif
+}
+
+void Circuit::toggle(size_t ch) {
+  toggleOutput(_relayPin[ch]);
 }
 
 void Circuit::check() {

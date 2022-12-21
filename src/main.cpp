@@ -3,11 +3,15 @@
 #include <Ticker.h>
 #include "config.h"
 #include "Circuit.h"
+#include "Button.h"
 #include "MqttClient.h"
 #include "LED.h"
 
 Circuit circuit;
 MQTTClient mqtt;
+#ifndef DISABLE_BUTTONS
+  Button button(&circuit);
+#endif
 
 Ticker stateUpdate;
 Ticker sysUpdate;
@@ -26,6 +30,8 @@ void setup() {
     sprintf(uid, "sonoff_%06X", ESP.getChipId());
   #elif DEVICE == GOSUND
     sprintf(uid, "gosund_%06X", ESP.getChipId());
+  #elif DEVICE == SHELLY
+    sprintf(uid, "shelly_%06X", ESP.getChipId());
   #endif
 
   LOG_BEGIN(115200);
@@ -33,9 +39,12 @@ void setup() {
 
   initLED();
 
-  // Setup buttons & relays, restore state
-  // Puts device into update mode (no MQTT) if first button is held
-  circuit.init(updateInProgress);
+  // Setup relay(s), restore state
+  circuit.init();
+  #ifndef DISABLE_BUTTONS
+    // Setup button(s), put device into update mode (no MQTT) if first button is held
+    button.begin(updateInProgress);
+  #endif
 
   LOG_F("Connecting to wifi %s: ", WIFI_SSID);
   startBlinking(blinkTimer); // Blink LED until wifi && mqtt connected

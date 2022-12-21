@@ -8,22 +8,20 @@
 class Circuit {
   public:
     Circuit();
-    void init(bool &updateMode);
+    void init();
     void setChangeCallback(state_callback_t cb);
     bool get(size_t ch);
     void set(size_t ch, bool state);
+    void toggle(size_t ch);
     void check();
     void processChanges(bool runCallback = true);
 
   private:
-    static const size_t _buttonPin[CHANNELS];
     static const size_t _relayPin[CHANNELS];
     static const bool _restoreState[CHANNELS];
 
     bool _currentState[CHANNELS];
     bool _lastState[CHANNELS]; // Last state reported
-    unsigned long _btnCount[CHANNELS];
-    Ticker _btnTimer[CHANNELS];
     state_callback_t _changeCallback;
 };
 
