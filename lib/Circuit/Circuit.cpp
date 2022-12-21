@@ -13,8 +13,10 @@ Circuit::Circuit() :
 {}
 
 void Circuit::init(bool &updateMode) {
-  #ifdef GOSUND
+  #ifdef STATE
     pinMode(STATE, INPUT);
+  #endif
+  #ifdef BTN_LED
     pinMode(BTN_LED, OUTPUT);
   #endif
 
@@ -36,7 +38,7 @@ void Circuit::init(bool &updateMode) {
     _lastState[ch] = get(ch);
 
     _btnTimer[ch].attach_ms(50, [this, ch]() {
-      #ifdef GOSUND
+      #ifdef BTN_LED
         // Keep LED in sync with circuit state
         invertedWrite(BTN_LED, get(ch));
       #endif

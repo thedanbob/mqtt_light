@@ -2,7 +2,7 @@
 #include "config.h"
 #include "helper.h"
 
-#if ENABLE_LED
+#ifndef DISABLE_LINK_LED
 
 void initLED() {
   pinMode(LINK_LED, OUTPUT);

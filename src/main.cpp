@@ -22,10 +22,10 @@ void reboot() {
 }
 
 void setup() {
-  #ifdef GOSUND
-    sprintf(uid, "gosund_%06X", ESP.getChipId());
-  #else
+  #if DEVICE == SONOFF
     sprintf(uid, "sonoff_%06X", ESP.getChipId());
+  #elif DEVICE == GOSUND
+    sprintf(uid, "gosund_%06X", ESP.getChipId());
   #endif
 
   LOG_BEGIN(115200);
@@ -66,7 +66,7 @@ void setup() {
     });
   #endif
 
-  #if defined(DEBUG) || ENABLE_LED
+  #if defined(DEBUG) || !defined(DISABLE_LINK_LED)
     ArduinoOTA.onProgress([](size_t progress, size_t total) {
       LOG_F("Progress: %u%%\r", (progress / (total / 100)));
       setLED((progress / (total / 20)) % 2); // Toggle LED every 5%
