@@ -94,7 +94,7 @@ void Circuit::processChanges(bool runCallback) {
       EEPROM.commit();
     }
 
-    if (runCallback) {
+    if (runCallback && _changeCallback != nullptr) {
       _changeCallback(ch, _currentState[ch]);
     }
   }
