@@ -9,7 +9,7 @@ class Circuit {
   public:
     Circuit();
     void init(bool &updateMode);
-    void setChangeCallback(channel_callback_t cb);
+    void setChangeCallback(state_callback_t cb);
     bool get(size_t ch);
     void set(size_t ch, bool state);
     void check();
@@ -24,7 +24,7 @@ class Circuit {
     bool _lastState[CHANNELS]; // Last state reported
     unsigned long _btnCount[CHANNELS];
     Ticker _btnTimer[CHANNELS];
-    channel_callback_t _changeCallback;
+    state_callback_t _changeCallback;
 };
 
 #endif

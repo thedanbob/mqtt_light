@@ -54,7 +54,7 @@ void Circuit::init(bool &updateMode) {
   }
 }
 
-void Circuit::setChangeCallback(channel_callback_t cb) {
+void Circuit::setChangeCallback(state_callback_t cb) {
   _changeCallback = cb;
 }
 

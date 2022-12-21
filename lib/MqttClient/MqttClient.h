@@ -16,7 +16,7 @@ class MQTTClient {
     void sendState(size_t ch, bool state);
     void sendSys();
     void sendDiscovery(size_t ch, String uid);
-    void setCommandCallback(channel_callback_t cb);
+    void setCommandCallback(state_callback_t cb);
 
   private:
     static const String _names[];
@@ -26,7 +26,7 @@ class MQTTClient {
 
     WiFiClient _wifiClient;
     PubSubClient _pubSubClient;
-    channel_callback_t _cmdCallback;
+    state_callback_t _cmdCallback;
 
     String _commandTopic(size_t ch, bool includeBase = true);
     String _stateTopic(size_t ch, bool includeBase = true);

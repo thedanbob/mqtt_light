@@ -4,7 +4,7 @@
 #include <Arduino.h>
 #include <functional>
 
-typedef std::function<void (size_t ch, bool state)> channel_callback_t;
+typedef std::function<void (size_t ch, bool state)> state_callback_t;
 
 inline int invertedRead(uint8_t pin) { return !digitalRead(pin); }
 inline void invertedWrite(uint8_t pin, uint8_t val) { digitalWrite(pin, !val); }

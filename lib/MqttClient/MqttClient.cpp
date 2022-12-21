@@ -135,7 +135,7 @@ void MQTTClient::sendDiscovery(size_t ch, String uid) {
   );
 }
 
-void MQTTClient::setCommandCallback(channel_callback_t cb) {
+void MQTTClient::setCommandCallback(state_callback_t cb) {
   _cmdCallback = cb;
 }
 
