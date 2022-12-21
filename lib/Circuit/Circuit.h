@@ -8,7 +8,7 @@
 class Circuit {
   public:
     Circuit();
-    void init();
+    void begin();
     void setChangeCallback(state_callback_t cb);
     bool get(size_t ch);
     void set(size_t ch, bool state);

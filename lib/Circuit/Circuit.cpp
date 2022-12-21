@@ -9,7 +9,7 @@ Circuit::Circuit() :
   _lastState{SLICE(false, false, false, false)}
 {}
 
-void Circuit::init() {
+void Circuit::begin() {
   #ifdef STATE
     pinMode(STATE, INPUT);
   #endif

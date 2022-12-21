@@ -40,7 +40,7 @@ void setup() {
   initLED();
 
   // Setup relay(s), restore state
-  circuit.init();
+  circuit.begin();
   #ifndef DISABLE_BUTTONS
     // Setup button(s), put device into update mode (no MQTT) if first button is held
     button.begin(updateInProgress);
