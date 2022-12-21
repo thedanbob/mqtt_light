@@ -4,6 +4,7 @@
 // Device types
 #define SONOFF 0
 #define GOSUND 1
+#define SHELLY 2
 
 /*
   ====================================================================================================
@@ -23,7 +24,7 @@
 //#define MQTT_RETAIN true                // Retain state/availability messages (recommended)
 //#define MQTT_QOS 0                      // QOS level for mqtt messages (0 or 1)
 
-//#define DEVICE SONOFF                   // SONOFF or GOSUND
+//#define DEVICE SONOFF                   // SONOFF, GOSUND, or SHELLY
 
 // Friendly name for device discovery
 //#define NAME "MQTT Light"
@@ -191,6 +192,11 @@
   #define BUTTONS 0
   #define RELAYS 14
   #define STATE 4 // 3-way switch, separate pin to sense circuit status
+#elif DEVICE == SHELLY
+  #define RELAYS 4
+  #define DISABLE_LINK_LED
+  #define DISABLE_BUTTON
+  #define BUTTONS // Unused, just to avoid compilation errors
 #endif
 
 #define RESTORE_STATES SLICE(RESTORE_STATE_1, RESTORE_STATE_2, RESTORE_STATE_3, RESTORE_STATE_4)
@@ -209,6 +215,8 @@
     #else
       #define DEVICE_MODEL "Gosund SW6"
     #endif
+  #elif DEVICE == SHELLY
+    #define DEVICE_MODEL "Shelly 1"
   #endif
 #endif
 
