@@ -1,17 +1,17 @@
 #include "Watchdog.h"
 #include "config.h"
 
-Watchdog::Watchdog(Circuit *circuit) :
+Watchdog::Watchdog(Circuit *c) :
   _timer{Ticker{}}
 {
-  _circuit = circuit;
+  _circuitPtr = c;
 }
 
 void Watchdog::start() {
   if (_timer.active()) return;
 
   _timer.once(WIFI_TIMEOUT*60, [this]() {
-    _circuit->processChanges(false); // Save current state before reboot (if configured)
+    _circuitPtr->processChanges(false); // Save current state before reboot (if configured)
     ESP.restart();
   });
 }

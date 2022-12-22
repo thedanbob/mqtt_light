@@ -8,13 +8,13 @@
 
 class Button {
   public:
-    Button(Circuit *circuit);
+    Button(Circuit *c);
     void begin(bool &updateMode);
 
   private:
     static const size_t _pin[CHANNELS];
 
-    Circuit *_circuit;
+    Circuit *_circuitPtr;
     unsigned long _count[CHANNELS];
     Ticker _timer[CHANNELS];
 };
