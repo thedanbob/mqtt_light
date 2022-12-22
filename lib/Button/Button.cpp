@@ -1,5 +1,7 @@
 #include "Button.h"
 
+#ifndef DISABLE_BUTTON
+
 const size_t Button::_pin[]{BUTTONS};
 
 Button::Button(Circuit *circuit) :
@@ -41,3 +43,10 @@ void Button::begin(bool &updateMode) {
     });
   }
 }
+
+#else
+
+Button::Button(Circuit *circuit) {}
+void Button::begin(bool &updateMode) {}
+
+#endif

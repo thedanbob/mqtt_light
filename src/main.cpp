@@ -9,9 +9,7 @@
 
 Circuit circuit;
 MQTTClient mqtt;
-#ifndef DISABLE_BUTTONS
-  Button button(&circuit);
-#endif
+Button button(&circuit);
 
 Ticker stateUpdate;
 Ticker sysUpdate;
@@ -39,12 +37,8 @@ void setup() {
 
   initLED();
 
-  // Setup relay(s), restore state
   circuit.begin();
-  #ifndef DISABLE_BUTTONS
-    // Setup button(s), put device into update mode (no MQTT) if first button is held
-    button.begin(updateInProgress);
-  #endif
+  button.begin(updateInProgress);
 
   LOG_F("Connecting to wifi %s: ", WIFI_SSID);
   startBlinking(blinkTimer); // Blink LED until wifi && mqtt connected
