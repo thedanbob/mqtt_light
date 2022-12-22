@@ -173,20 +173,12 @@
 #define SLICE4(a, b, c, d) a, b, c, d
 #define SLICE CONCAT(SLICE, CHANNELS)
 
-// Other constants
+// Hardware constants
 #if DEVICE == SONOFF
   #define LINK_LED 13
   #define BUTTONS SLICE(0, 9, 10, 14)
   #define RELAYS SLICE(12, 5, 4, 15)
 #elif DEVICE == GOSUND
-  #ifndef DEVICE_MODEL
-    #ifndef THREEWAY
-      #define DEVICE_MODEL "Gosund SW1"
-    #else
-      #define DEVICE_MODEL "Gosund SW6"
-    #endif
-  #endif
-  #define CHANNELS 1
   #define BTN_LED 2 // Circuit status LED
   #define LINK_LED 16 // Wifi & MQTT status LED
   #define BUTTONS 0
