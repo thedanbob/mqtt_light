@@ -2,15 +2,15 @@
 #include <ESP8266WiFi.h>
 #include <Ticker.h>
 #include "config.h"
-#include "Circuit.h"
-#include "Button.h"
 #include "MqttClient.h"
 #include "LED.h"
+#include "Circuit.h"
+#include "Button.h"
 #include "Watchdog.h"
 
+MQTTClient mqtt;
 LED linkLED;
 Circuit circuit;
-MQTTClient mqtt;
 Button button(&circuit);
 Watchdog watchdog(&circuit);
 
@@ -36,17 +36,17 @@ void setup() {
   button.begin(updateInProgress);
 
   LOG_F("Connecting to wifi %s: ", WIFI_SSID);
-  linkLED.blink();
-
   WiFi.mode(WIFI_STA);
   WiFi.hostname(uid);
   WiFi.setAutoReconnect(true);
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
-  while (WiFi.waitForConnectResult() != WL_CONNECTED) LOG(".");
+  linkLED.blink();
+  watchdog.start();
+  while (WiFi.waitForConnectResult(1000) != WL_CONNECTED) LOG(".");
 
-  LOG_LN("done");
-  LOG("IP Address is "); LOG_LN(WiFi.localIP());
+  watchdog.stop();
+  LOG("done\nIP Address is "); LOG_LN(WiFi.localIP());
 
   ArduinoOTA.setHostname(uid);
 
@@ -108,7 +108,7 @@ void setup() {
 }
 
 void loop() {
-  if (WiFi.status() != WL_CONNECTED) {
+  if (!WiFi.isConnected()) {
     linkLED.blink();
     watchdog.start();
 
