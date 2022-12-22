@@ -6,22 +6,18 @@
 #include "Button.h"
 #include "MqttClient.h"
 #include "LED.h"
+#include "Watchdog.h"
 
 LED linkLED;
 Circuit circuit;
 MQTTClient mqtt;
 Button button(&circuit);
+Watchdog watchdog(&circuit);
 
 Ticker stateUpdate;
 Ticker sysUpdate;
-Ticker watchdog;
 bool updateInProgress{false};
 char uid[16];
-
-void reboot() {
-  circuit.processChanges(false); // Save current state before reboot (if configured)
-  ESP.restart();
-}
 
 void setup() {
   #if DEVICE == SONOFF
@@ -113,14 +109,13 @@ void setup() {
 
 void loop() {
   if (WiFi.status() != WL_CONNECTED) {
-    if (!watchdog.active()) {
-      watchdog.once(WIFI_TIMEOUT*60, reboot);
-    }
     linkLED.blink();
+    watchdog.start();
+
     if (WiFi.waitForConnectResult() != WL_CONNECTED) return;
   }
 
-  watchdog.detach();
+  watchdog.stop();
 
   ArduinoOTA.handle();
   if (updateInProgress) return; // Disable mqtt handling during update
