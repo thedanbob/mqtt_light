@@ -53,72 +53,63 @@ void setup() {
   LOG_LN("done");
   LOG("IP Address is "); LOG_LN(WiFi.localIP());
 
-  // Setup OTA updates
   ArduinoOTA.setHostname(uid);
 
   ArduinoOTA.onStart([]() {
     LOG_LN("OTA update initiated...");
-
     mqtt.disconnect();
     updateInProgress = true;
   });
 
-  #ifdef DEBUG
-    ArduinoOTA.onEnd([]() {
-      LOG_LN("\nOTA update done, restarting...");
-    });
-  #endif
+  ArduinoOTA.onEnd([]() {
+    LOG_LN("\nOTA update done, restarting...");
+  });
 
-  #if defined(DEBUG) || !defined(DISABLE_LINK_LED)
-    ArduinoOTA.onProgress([](size_t progress, size_t total) {
-      LOG_F("Progress: %u%%\r", (progress / (total / 100)));
-      setLED((progress / (total / 20)) % 2); // Toggle LED every 5%
-    });
-  #endif
+  ArduinoOTA.onProgress([](size_t progress, size_t total) {
+    LOG_F("Progress: %u%%\r", (progress / (total / 100)));
+    setLED((progress / (total / 20)) % 2); // Toggle LED every 5%
+  });
 
   ArduinoOTA.onError([](ota_error_t error) {
-    #ifdef DEBUG
-      LOG_F("OTA error: [%u] ", error);
-      switch(error) {
-        case OTA_AUTH_ERROR:
-          LOG_LN("Auth Failed"); break;
-        case OTA_BEGIN_ERROR:
-          LOG_LN("Begin Failed"); break;
-        case OTA_CONNECT_ERROR:
-          LOG_LN("Connect Failed"); break;
-        case OTA_RECEIVE_ERROR:
-          LOG_LN("Receive Failed"); break;
-        case OTA_END_ERROR:
-          LOG_LN("End Failed"); break;
-      }
-    #endif
+    LOG_F("OTA error: [%u] ", error);
+    switch(error) {
+      case OTA_AUTH_ERROR:
+        LOG_LN("Auth Failed"); break;
+      case OTA_BEGIN_ERROR:
+        LOG_LN("Begin Failed"); break;
+      case OTA_CONNECT_ERROR:
+        LOG_LN("Connect Failed"); break;
+      case OTA_RECEIVE_ERROR:
+        LOG_LN("Receive Failed"); break;
+      case OTA_END_ERROR:
+        LOG_LN("End Failed"); break;
+    }
 
     ESP.restart();
   });
 
   ArduinoOTA.begin(false);
+  if (updateInProgress) return;
 
-  if (!updateInProgress) {
-    // Set callback to run when mqtt command received
-    mqtt.setCommandCallback([](size_t ch, bool state) {
-      circuit.set(ch, state);
-    });
+  // Set callback to run when mqtt command received
+  mqtt.setCommandCallback([](size_t ch, bool state) {
+    circuit.set(ch, state);
+  });
 
-    // Set callback to run when circuit state changes
-    circuit.setChangeCallback([](size_t ch, bool state) {
-      mqtt.sendState(ch, state);
-    });
+  // Set callback to run when circuit state changes
+  circuit.setChangeCallback([](size_t ch, bool state) {
+    mqtt.sendState(ch, state);
+  });
 
-    // Check circuit state every quarter second
-    stateUpdate.attach_ms(250, []() {
-      circuit.check();
-    });
+  // Check circuit state every quarter second
+  stateUpdate.attach_ms(250, []() {
+    circuit.check();
+  });
 
-    // Update system info every 10 seconds
-    sysUpdate.attach(10, []() {
-      mqtt.sendSys();
-    });
-  }
+  // Update system info every 10 seconds
+  sysUpdate.attach(10, []() {
+    mqtt.sendSys();
+  });
 }
 
 void loop() {
