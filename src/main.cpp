@@ -7,13 +7,13 @@
 #include "MqttClient.h"
 #include "LED.h"
 
+LED linkLED;
 Circuit circuit;
 MQTTClient mqtt;
 Button button(&circuit);
 
 Ticker stateUpdate;
 Ticker sysUpdate;
-Ticker blinkTimer;
 Ticker watchdog;
 bool updateInProgress{false};
 char uid[16];
@@ -35,13 +35,12 @@ void setup() {
   LOG_BEGIN(115200);
   LOG_F("\n\nUnit ID: %s\n", uid);
 
-  initLED();
-
+  linkLED.begin();
   circuit.begin();
   button.begin(updateInProgress);
 
   LOG_F("Connecting to wifi %s: ", WIFI_SSID);
-  startBlinking(blinkTimer); // Blink LED until wifi && mqtt connected
+  linkLED.blink();
 
   WiFi.mode(WIFI_STA);
   WiFi.hostname(uid);
@@ -67,7 +66,7 @@ void setup() {
 
   ArduinoOTA.onProgress([](size_t progress, size_t total) {
     LOG_F("Progress: %u%%\r", (progress / (total / 100)));
-    setLED((progress / (total / 20)) % 2); // Toggle LED every 5%
+    linkLED.set((progress / (total / 20)) % 2); // Toggle LED every 5%
   });
 
   ArduinoOTA.onError([](ota_error_t error) {
@@ -117,7 +116,7 @@ void loop() {
     if (!watchdog.active()) {
       watchdog.once(WIFI_TIMEOUT*60, reboot);
     }
-    startBlinking(blinkTimer);
+    linkLED.blink();
     if (WiFi.waitForConnectResult() != WL_CONNECTED) return;
   }
 
@@ -128,7 +127,7 @@ void loop() {
 
   // (Re)connect to mqtt
   if (!mqtt.connected()) {
-    startBlinking(blinkTimer);
+    linkLED.blink();
 
     if (!mqtt.connect(uid)) {
       delay(100);
@@ -143,7 +142,7 @@ void loop() {
     }
   }
 
-  stopBlinking(blinkTimer);
+  linkLED.reset();
   mqtt.loop();
   circuit.processChanges();
 }

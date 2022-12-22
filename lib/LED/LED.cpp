@@ -4,35 +4,40 @@
 
 #ifndef DISABLE_LINK_LED
 
-void initLED() {
+LED::LED() :
+  _timer{Ticker{}}
+{}
+
+void LED::begin() {
   pinMode(LINK_LED, OUTPUT);
-  setLED(HIGH);
+  set(HIGH);
 }
 
-void setLED(int state) {
+void LED::set(bool state) {
   invertedWrite(LINK_LED, state);
 }
 
-void startBlinking(Ticker &timer) {
-  if (timer.active()) return;
+void LED::blink() {
+  if (_timer.active()) return;
 
-  timer.attach_ms(300, []() {
+  _timer.attach_ms(300, []() {
     digitalWrite(LINK_LED, !digitalRead(LINK_LED));
   });
 }
 
-void stopBlinking(Ticker &timer) {
-  if (!timer.active()) return;
+void LED::reset() {
+  if (!_timer.active()) return;
 
-  timer.detach();
+  _timer.detach();
   invertedWrite(LINK_LED, HIGH);
 }
 
 #else
 
-void initLED() {}
-void setLED(int state) {}
-void startBlinking(Ticker &timer) {}
-void stopBlinking(Ticker &timer) {}
+LED::LED() {}
+void LED::begin() {}
+void LED::set(bool state) {}
+void LED::blink() {}
+void LED::reset() {}
 
 #endif
