@@ -16,4 +16,5 @@ The Gosund SW6 is a smart 3-way light switch, but it can be used in 2-way mode (
 
 ## Other firmware
 
-[MQTT Garage Door](https://github.com/thedanbob/mqtt_garage_door)
+[MQTT Garage Door](https://github.com/thedanbob/mqtt_garage_door) \
+[MQTT Power Cycler](https://github.com/thedanbob/mqtt_power_cycle)
