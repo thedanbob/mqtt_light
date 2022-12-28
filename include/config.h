@@ -109,6 +109,8 @@
   #define MQTT_MSG_DOWN "offline"
   #define MQTT_MSG_DOWN_DEFAULT
 #endif
+
+// Not used by Home Assistant
 #ifndef MQTT_MSG_RESTART
   #define MQTT_MSG_RESTART "restart"
 #endif

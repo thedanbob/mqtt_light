@@ -14,6 +14,10 @@ You can also add `upload_port = 192.168.1.3` to platformio.ini instead of using 
 
 The Gosund SW6 is a smart 3-way light switch, but it can be used in 2-way mode (same as the SW1). Simply connect the load to Traveler 2 and omit the `THREEWAY` define.
 
+## Remote reboot
+
+You can reboot the devices via MQTT by sending a message (default: `restart`) manually to the device's command topic (default: `<base topic>/cmd`). Home Assistant provides a way to publish arbitrary messages in Settings > Devices & Services > (MQTT Integration) Configure.
+
 ## Other firmware
 
 [MQTT Garage Door](https://github.com/thedanbob/mqtt_garage_door) \
