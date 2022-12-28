@@ -1,5 +1,5 @@
-#ifndef SONOFF_CONFIG_H
-#define SONOFF_CONFIG_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
 // Device types
 #define SONOFF 0
@@ -47,10 +47,7 @@
 //#define DISABLE_LINK_LED    // Enable the status LED
 //#define THREEWAY            // Put Gosund SW6 in 3-way mode (2-way by default)
 //#define REVERSE_STATE       // Reverse state pin (LOW = on) (Gosund SW6 only)
-
-
-// Uncomment below to enable debug reporting
-//#define DEBUG
+//#define DEBUG               // Enable serial debug reporting
 
 /*
   ====================================================================================================
@@ -60,7 +57,7 @@
 
 #include <Arduino.h>
 
-// Defaults
+/* ==== Wifi Config ==== */
 #ifndef WIFI_SSID
   #define WIFI_SSID "wifi_ssid"
 #endif
@@ -70,6 +67,9 @@
 #ifndef WIFI_TIMEOUT
   #define WIFI_TIMEOUT 10
 #endif
+
+
+/* ==== MQTT config ==== */
 #ifndef MQTT_SERVER
   #define MQTT_SERVER "192.168.0.1"
 #endif
@@ -92,6 +92,35 @@
   #define MQTT_QOS 0
 #endif
 
+// Home Assistant defaults
+#ifndef MQTT_MSG_ON
+  #define MQTT_MSG_ON "ON"
+  #define MQTT_MSG_ON_DEFAULT
+#endif
+#ifndef MQTT_MSG_OFF
+  #define MQTT_MSG_OFF "OFF"
+  #define MQTT_MSG_OFF_DEFAULT
+#endif
+#ifndef MQTT_MSG_UP
+  #define MQTT_MSG_UP "online"
+  #define MQTT_MSG_UP_DEFAULT
+#endif
+#ifndef MQTT_MSG_DOWN
+  #define MQTT_MSG_DOWN "offline"
+  #define MQTT_MSG_DOWN_DEFAULT
+#endif
+#ifndef MQTT_MSG_RESTART
+  #define MQTT_MSG_RESTART "restart"
+#endif
+
+// Other MQTT constants
+#define MQTT_CMD_SUF "/cmd"
+#define MQTT_STATE_SUF "/stat"
+#define MQTT_ATTR_SUF "/sys"
+#define MQTT_AVTY_SUF "/up"
+
+
+/* ==== Device config ==== */
 #ifndef DEVICE
   #define DEVICE SONOFF
 #endif
@@ -115,22 +144,6 @@
   #define CHANNELS 4
 #endif
 
-#ifdef RESTORE_STATE
-  #define RESTORE_STATE_1 RESTORE_STATE
-#endif
-#ifndef RESTORE_STATE_1
-  #define RESTORE_STATE_1 true
-#endif
-#ifndef RESTORE_STATE_2
-  #define RESTORE_STATE_2 true
-#endif
-#ifndef RESTORE_STATE_3
-  #define RESTORE_STATE_3 true
-#endif
-#ifndef RESTORE_STATE_4
-  #define RESTORE_STATE_4 true
-#endif
-
 #ifdef NAME
   #define NAME_1 NAME
 #endif
@@ -147,52 +160,21 @@
   #define NAME_4 ""
 #endif
 
-// Debug helpers
-#ifdef DEBUG
-  #define LOG_BEGIN(x) Serial.begin(x)
-  #define LOG(x) Serial.print(x)
-  #define LOG_LN(x) Serial.println(x)
-  #define LOG_F(x, ...) Serial.printf(x, __VA_ARGS__)
-#else
-  #define LOG_BEGIN(x)
-  #define LOG(x)
-  #define LOG_LN(x)
-  #define LOG_F(x, ...)
+#ifdef RESTORE_STATE
+  #define RESTORE_STATE_1 RESTORE_STATE
 #endif
-
-// String helpers (must be defined twice for reasons)
-#define STR_HELPER(x) #x
-#define STR(x) STR_HELPER(x)
-#define CONCAT_HELPER(a, b) a##b
-#define CONCAT(a, b) CONCAT_HELPER(a, b)
-
-// Array initialization helpers
-#define SLICE1(a, b, c, d) a
-#define SLICE2(a, b, c, d) a, b
-#define SLICE3(a, b, c, d) a, b, c
-#define SLICE4(a, b, c, d) a, b, c, d
-#define SLICE CONCAT(SLICE, CHANNELS)
-
-// Hardware constants
-#if DEVICE == SONOFF
-  #define LINK_LED 13
-  #define BUTTONS SLICE(0, 9, 10, 14)
-  #define RELAYS SLICE(12, 5, 4, 15)
-#elif DEVICE == GOSUND
-  #define BTN_LED 2 // Circuit status LED
-  #define LINK_LED 16 // Wifi & MQTT status LED
-  #define BUTTONS 0
-  #define RELAYS 14
-  #define STATE 4 // 3-way switch, separate pin to sense circuit status
-#elif DEVICE == SHELLY
-  #define RELAYS 4
-  #define DISABLE_LINK_LED
-  #define DISABLE_BUTTON
-  #define BUTTONS // Unused, just to avoid compilation errors
+#ifndef RESTORE_STATE_1
+  #define RESTORE_STATE_1 true
 #endif
-
-#define RESTORE_STATES SLICE(RESTORE_STATE_1, RESTORE_STATE_2, RESTORE_STATE_3, RESTORE_STATE_4)
-#define NAMES SLICE(NAME_1, NAME_2, NAME_3, NAME_4)
+#ifndef RESTORE_STATE_2
+  #define RESTORE_STATE_2 true
+#endif
+#ifndef RESTORE_STATE_3
+  #define RESTORE_STATE_3 true
+#endif
+#ifndef RESTORE_STATE_4
+  #define RESTORE_STATE_4 true
+#endif
 
 #ifndef DEVICE_MODEL
   #if DEVICE == SONOFF
@@ -216,34 +198,60 @@
   #define DEVICE_NAME DEVICE_MODEL
 #endif
 
-#define MQTT_CMD_SUF "/cmd"
-#define MQTT_STATE_SUF "/stat"
-#define MQTT_ATTR_SUF "/sys"
-#define MQTT_AVTY_SUF "/up"
 
-// Home Assistant defaults
-#ifndef MQTT_MSG_ON
-  #define MQTT_MSG_ON "ON"
-  #define MQTT_MSG_ON_DEFAULT
-#endif
-#ifndef MQTT_MSG_OFF
-  #define MQTT_MSG_OFF "OFF"
-  #define MQTT_MSG_OFF_DEFAULT
-#endif
-#ifndef MQTT_MSG_UP
-  #define MQTT_MSG_UP "online"
-  #define MQTT_MSG_UP_DEFAULT
-#endif
-#ifndef MQTT_MSG_DOWN
-  #define MQTT_MSG_DOWN "offline"
-  #define MQTT_MSG_DOWN_DEFAULT
-#endif
-#ifndef MQTT_MSG_RESTART
-  #define MQTT_MSG_RESTART "restart"
+/* ==== Helpers & convenience constants ==== */
+
+// String helpers (must be defined twice for reasons)
+#define STR_HELPER(x) #x
+#define STR(x) STR_HELPER(x)
+#define CONCAT_HELPER(a, b) a##b
+#define CONCAT(a, b) CONCAT_HELPER(a, b)
+
+// Array initialization helpers
+#define SLICE1(a, b, c, d) a
+#define SLICE2(a, b, c, d) a, b
+#define SLICE3(a, b, c, d) a, b, c
+#define SLICE4(a, b, c, d) a, b, c, d
+#define SLICE CONCAT(SLICE, CHANNELS)
+
+#define RESTORE_STATES SLICE(RESTORE_STATE_1, RESTORE_STATE_2, RESTORE_STATE_3, RESTORE_STATE_4)
+#define NAMES SLICE(NAME_1, NAME_2, NAME_3, NAME_4)
+
+
+/* ==== Hardware constants ==== */
+#if DEVICE == SONOFF
+  #define LINK_LED 13
+  #define BUTTONS SLICE(0, 9, 10, 14)
+  #define RELAYS SLICE(12, 5, 4, 15)
+#elif DEVICE == GOSUND
+  #define BTN_LED 2 // Circuit status LED
+  #define LINK_LED 16 // Wifi & MQTT status LED
+  #define BUTTONS 0
+  #define RELAYS 14
+  #define STATE 4 // 3-way switch, separate pin to sense circuit status
+#elif DEVICE == SHELLY
+  #define RELAYS 4
+  #define DISABLE_LINK_LED
+  #define DISABLE_BUTTON
+  #define BUTTONS // Unused, just to avoid compilation errors
 #endif
 
+
+/* ==== Other ==== */
 #ifndef VERSION
   #define VERSION "20220412000000"
+#endif
+
+#ifdef DEBUG
+  #define LOG_BEGIN(x) Serial.begin(x)
+  #define LOG(x) Serial.print(x)
+  #define LOG_LN(x) Serial.println(x)
+  #define LOG_F(x, ...) Serial.printf(x, __VA_ARGS__)
+#else
+  #define LOG_BEGIN(x)
+  #define LOG(x)
+  #define LOG_LN(x)
+  #define LOG_F(x, ...)
 #endif
 
 #endif
