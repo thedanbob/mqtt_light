@@ -60,12 +60,12 @@ void setup() {
     LOG_LN("\nOTA update done, restarting...");
   });
 
-  ArduinoOTA.onProgress([](size_t progress, size_t total) {
+  ArduinoOTA.onProgress([](auto progress, auto total) {
     LOG_F("Progress: %u%%\r", (progress / (total / 100)));
     linkLED.set((progress / (total / 20)) % 2); // Toggle LED every 5%
   });
 
-  ArduinoOTA.onError([](ota_error_t error) {
+  ArduinoOTA.onError([](auto error) {
     LOG_F("OTA error: [%u] ", error);
     switch(error) {
       case OTA_AUTH_ERROR:
@@ -87,12 +87,12 @@ void setup() {
   if (updateInProgress) return;
 
   // Set callback to run when mqtt command received
-  mqtt.setCommandCallback([](size_t ch, bool state) {
+  mqtt.setCommandCallback([](auto ch, auto state) {
     circuit.set(ch, state);
   });
 
   // Set callback to run when circuit state changes
-  circuit.setChangeCallback([](size_t ch, bool state) {
+  circuit.setChangeCallback([](auto ch, auto state) {
     mqtt.sendState(ch, state);
   });
 
