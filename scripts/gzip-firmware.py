@@ -1,8 +1,5 @@
 Import('env')
 
-# Only compress OTA updates
-if env["UPLOAD_PROTOCOL"] != "espota": exit
-
 import os
 import shutil
 import pathlib
@@ -38,6 +35,7 @@ def set_gzip_source(source, target, env):
     env.Replace(UPLOADCMD=env["UPLOADCMD"].replace("$SOURCE", "$SOURCE\.gz"))
 
 # Modify build environment
-env.Append(CPPDEFINES=["ATOMIC_FS_UPDATE"])
-env.AddPostAction("$BUILD_DIR/${PROGNAME}.bin", [gzip_firmware])
-env.AddPreAction("upload", set_gzip_source)
+if env["UPLOAD_PROTOCOL"] == "espota":
+    env.Append(CPPDEFINES=["ATOMIC_FS_UPDATE"])
+    env.AddPostAction("$BUILD_DIR/${PROGNAME}.bin", [gzip_firmware])
+    env.AddPreAction("upload", set_gzip_source)
