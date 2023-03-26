@@ -1,11 +1,12 @@
 #include "Button.h"
+#include "helper.h"
 
 #ifndef DISABLE_BUTTON
 
 const size_t Button::_pin[]{BUTTONS};
 
 Button::Button(Circuit *c) :
-  _count{SLICE(0, 0, 0, 0)},
+  _pressed{SLICE(false, false, false, false)},
   _timer{SLICE(Ticker{}, Ticker{}, Ticker{}, Ticker{})}
 {
   _circuitPtr = c;
@@ -33,12 +34,12 @@ void Button::begin(bool &updateMode) {
 
       // Toggle relay after momentary button press
       if (invertedRead(_pin[ch])) {
-        _count[ch]++;
-      } else {
-        if (_count[ch] > 1) {
+        if (!_pressed[ch]) {
           _circuitPtr->toggle(ch);
-          _count[ch] = 0;
         }
+        _pressed[ch] = true;
+      } else {
+        _pressed[ch] = false;
       }
     });
   }

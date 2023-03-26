@@ -3,7 +3,6 @@
 
 #include <Ticker.h>
 #include "config.h"
-#include "helper.h"
 #include "Circuit.h"
 
 class Button {
@@ -15,7 +14,7 @@ class Button {
     static const size_t _pin[CHANNELS];
 
     Circuit *_circuitPtr;
-    unsigned long _count[CHANNELS];
+    boolean _pressed[CHANNELS];
     Ticker _timer[CHANNELS];
 };
 
