@@ -225,17 +225,20 @@
   #define LINK_LED 13
   #define BUTTONS SLICE(0, 9, 10, 14)
   #define RELAYS SLICE(12, 5, 4, 15)
+  #define UID_PREFIX "sonoff"
 #elif DEVICE == GOSUND
   #define BTN_LED 2 // Circuit status LED
   #define LINK_LED 16 // Wifi & MQTT status LED
   #define BUTTONS 0
   #define RELAYS 14
   #define STATE 4 // 3-way switch, separate pin to sense circuit status
+  #define UID_PREFIX "gosund"
 #elif DEVICE == SHELLY
   #define RELAYS 4
   #define DISABLE_LINK_LED
   #define DISABLE_BUTTON
   #define BUTTONS // Unused, just to avoid compilation errors
+  #define UID_PREFIX "shelly"
 #endif
 
 

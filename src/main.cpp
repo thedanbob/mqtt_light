@@ -17,16 +17,10 @@ Watchdog watchdog(&circuit);
 Ticker stateUpdate;
 Ticker sysUpdate;
 bool updateInProgress{false};
-char uid[16];
+char uid[sizeof(UID_PREFIX) + 9]; // 32-bit Chip ID is up to 8 hex characters so "_%06X" -> 9
 
 void setup() {
-  #if DEVICE == SONOFF
-    sprintf(uid, "sonoff_%06X", ESP.getChipId());
-  #elif DEVICE == GOSUND
-    sprintf(uid, "gosund_%06X", ESP.getChipId());
-  #elif DEVICE == SHELLY
-    sprintf(uid, "shelly_%06X", ESP.getChipId());
-  #endif
+  sprintf(uid, UID_PREFIX "_%06X", ESP.getChipId());
 
   LOG_BEGIN(115200);
   LOG_F("\n\nUnit ID: %s\n", uid);
