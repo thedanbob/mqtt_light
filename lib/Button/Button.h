@@ -7,13 +7,13 @@
 
 class Button {
   public:
-    Button(Circuit *c);
-    void begin(bool &updateMode);
+    explicit Button(Circuit* c);
+    void begin(bool& updateMode);
 
   private:
     static const size_t _pin[CHANNELS];
 
-    Circuit *_circuitPtr;
+    Circuit* _circuitPtr;
     boolean _pressed[CHANNELS];
     Ticker _timer[CHANNELS];
 };

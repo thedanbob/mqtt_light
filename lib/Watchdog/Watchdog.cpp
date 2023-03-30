@@ -1,7 +1,7 @@
 #include "Watchdog.h"
 #include "config.h"
 
-Watchdog::Watchdog(Circuit *c) :
+Watchdog::Watchdog(Circuit* c) :
   _timer{Ticker{}}
 {
   _circuitPtr = c;

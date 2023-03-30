@@ -6,13 +6,13 @@
 
 class Watchdog {
   public:
-    Watchdog(Circuit *c);
+    explicit Watchdog(Circuit* c);
     void start();
     void stop();
 
   private:
     Ticker _timer;
-    Circuit *_circuitPtr;
+    Circuit* _circuitPtr;
 };
 
 #endif

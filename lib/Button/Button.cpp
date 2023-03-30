@@ -5,14 +5,14 @@
 
 const size_t Button::_pin[]{BUTTONS};
 
-Button::Button(Circuit *c) :
+Button::Button(Circuit* c) :
   _pressed{SLICE(false, false, false, false)},
   _timer{SLICE(Ticker{}, Ticker{}, Ticker{}, Ticker{})}
 {
   _circuitPtr = c;
 }
 
-void Button::begin(bool &updateMode) {
+void Button::begin(bool& updateMode) {
   #ifdef BTN_LED
     pinMode(BTN_LED, OUTPUT);
   #endif
@@ -47,7 +47,7 @@ void Button::begin(bool &updateMode) {
 
 #else
 
-Button::Button(Circuit *c) {}
-void Button::begin(bool &updateMode) {}
+Button::Button(Circuit* c) {}
+void Button::begin(bool& updateMode) {}
 
 #endif
