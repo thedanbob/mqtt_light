@@ -187,7 +187,7 @@
     #endif
   #elif DEVICE == GOSUND
     #ifndef THREEWAY
-      #define DEVICE_MODEL "Gosund SW1"
+      #define DEVICE_MODEL "Gosund SW1/SW5"
     #else
       #define DEVICE_MODEL "Gosund SW6"
     #endif
